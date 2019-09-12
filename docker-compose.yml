@@ -1,0 +1,36 @@
+version: "3.1"
+services:
+
+  prometheus:
+    image: prom/prometheus
+    hostname: prometheus
+    volumes:
+      - ./prometheus-config/:/etc/prometheus/
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    ports:
+      - 9090:9090
+    restart: always
+
+  demo-app:
+    image: barrycommins/spring-boot-splunk-prometheus-metrics
+    hostname: demo-app
+    ports:
+      - 8080:8080
+
+  splunk:
+    image: splunk/splunk:7.3.0
+    hostname: splunk
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_USER=root
+      - SPLUNK_PASSWORD=password
+      - SPLUNK_ADD=index prometheus -datatype metric
+      - SPLUNK_APPS_URL=https://github.com/lukemonahan/splunk_modinput_prometheus/releases/download/Release_0.6.0/modinput_prometheus.tar.gz
+    volumes:
+      - ./splunk/inputs.conf:/opt/splunk/etc/system/local/inputs.conf
+    ports:
+      - 8000:8000

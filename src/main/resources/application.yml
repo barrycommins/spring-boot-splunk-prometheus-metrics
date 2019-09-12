@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: spring-boot-splunk-prometheus-metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
