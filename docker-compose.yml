@@ -13,7 +13,6 @@ services:
       - "--web.console.templates=/usr/share/prometheus/consoles"
     ports:
       - 9090:9090
-    restart: always
 
   demo-app:
     image: barrycommins/spring-boot-splunk-prometheus-metrics
@@ -22,15 +21,14 @@ services:
       - 8080:8080
 
   splunk:
-    image: splunk/splunk:7.3.0
+    image: splunk/splunk
     hostname: splunk
     environment:
       - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_USER=root
       - SPLUNK_PASSWORD=password
       - SPLUNK_ADD=index prometheus -datatype metric
       - SPLUNK_APPS_URL=https://github.com/lukemonahan/splunk_modinput_prometheus/releases/download/Release_0.6.0/modinput_prometheus.tar.gz
     volumes:
-      - ./splunk/inputs.conf:/opt/splunk/etc/system/local/inputs.conf
+      - ./splunk/default.yml:/tmp/defaults/default.yml
     ports:
       - 8000:8000
